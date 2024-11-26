@@ -10,10 +10,12 @@ const API_KEY = '00b1c81042msh7497f39eace171ap1afa1bjsn5c2db77e4674'; // Sua cha
 
 app.use(cors());
 
+
 const __filename = new URL(import.meta.url).pathname;
 const __dirname = path.dirname(__filename);
 
-// Alteração para salvar as imagens na pasta 'public/images'
+app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
+
 const imageFolder = path.join(__dirname, 'public', 'images');
 if (!fs.existsSync(imageFolder)) {
     fs.mkdirSync(imageFolder, { recursive: true });
@@ -67,7 +69,7 @@ const fetchFollowers = (username) => {
                     if (follower.profile_pic_url) {
                         try {
                             const imagePath = await downloadProfileImage(follower.profile_pic_url, follower.username);
-                            follower.profile_pic_local_path = imagePath; // Adiciona o caminho da imagem ao seguidor
+                            follower.profile_pic_local_path = `/images/${username}_profile.jpg`;
                         } catch (error) {
                         }
                     }
@@ -113,8 +115,8 @@ app.get('/api/instagram', async (req, res) => {
         const profileImageUrl = data.data.profile_pic_url;
         if (profileImageUrl) {
                 const imagePath = await downloadProfileImage(profileImageUrl, username); // Espera a Promise resolver
-                data.data.profile_pic_local_path = imagePath;
-        }
+                data.data.profile_pic_local_path = `/images/${username}_profile.jpg`;
+            }
 
         // Requisição para obter os seguidores do perfil
         try {
